@@ -50,3 +50,109 @@ docker exec -it todo-api dotnet ef database update
 | PUT | `/api/task/{id}/status` | Toggle task completion status |
 | DELETE | `/api/task/{id}/dependencies/{depId}` | Remove a dependency |
 
+
+
+# Solution Dependency Cycle Detection 
+
+## Why Do We Need Cycle Detection?
+
+Imagine you have a set of tasks dependent on each other:
+
+```
+Task A → Task B → Task C
+```
+
+This means:
+- **Task B** waits for **Task A** to finish.
+- **Task C** waits for **Task B** to finish.
+
+Now, suppose you try to add a new dependency like:
+
+```
+Task C → Task A (Task A depends on Task C)
+```
+
+You've just created a cycle:
+
+```
+A → B → C → A → ... (endless loop)
+```
+
+This makes it impossible to start any of these tasks because they’re all waiting for each other. Therefore, we need a method to detect and prevent such cycles.
+
+---
+
+## 🚩 How Do We Solve This?
+![alt text](image.png)
+We use the **DFS (Depth-First Search)** algorithm, which effectively detects any potential cycles before they're introduced.
+
+### 🛠️ Key Methods:
+
+- `CreatesCycleAsync(startTask, targetTask)`
+- `DFSAsync(current, target, visited)`
+
+###  `CreatesCycleAsync`
+
+- This is the starting point of the check.
+- Initializes a "visited" list to track checked tasks, and invokes the DFS method.
+
+###  `DFSAsync`
+
+This method carries out the detailed checking:
+
+- **Step 1:** Checks if the current task (`current`) matches the task you're trying to add (`target`). If yes, it’s a cycle.
+- **Step 2:** Marks the current task as visited.
+- **Step 3:** Retrieves all tasks dependent on the current task and recursively checks them.
+
+If, during this deep check, we encounter the starting task again, we've detected a cycle, and the system prevents this dependency from being added.
+
+---
+
+##  Example
+
+### Initial scenario:
+
+```
+Task A → Task B → Task C
+```
+
+Now you want to add:
+
+```
+Task C → Task A (Task A depends on Task C)
+```
+
+The checking process is:
+
+- Start from Task C:
+  - Task C depends on Task B
+  - Task B depends on Task A
+  - Task A has no dependencies, so it’s safe. No cycle.
+
+But if you try to add later:
+
+```
+Task A → Task C
+```
+
+Then:
+
+- Start from Task A, you find Task C.
+- From Task C, you find Task B.
+- From Task B, you find Task A again.
+
+=> **Cycle detected clearly:** `A → C → B → A`
+
+Therefore, the algorithm detects and disallows this addition.
+
+---
+
+## What Does the Application Return?
+
+- Returns `true`: Cycle detected (dependency NOT allowed).
+- Returns `false`: No cycle detected (dependency allowed).
+
+---
+
+
+
