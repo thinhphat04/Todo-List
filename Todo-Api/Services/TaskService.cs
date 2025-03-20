@@ -22,7 +22,6 @@ namespace Todo_Api.Services;
     
         public async Task<IEnumerable<Tasks>> GetAllTasksAsync()
         {
-            // AsNoTracking để EF không theo dõi, tối ưu cho đọc dữ liệu
             return await _context.Tasks.AsNoTracking().ToListAsync();
         }
 
@@ -42,25 +41,24 @@ namespace Todo_Api.Services;
             return task;
         }
 
-        public async Task<IEnumerable<Tasks>> GetTasksAsync(string search = null, int pageNumber = 1, int pageSize = 10)
+        public async Task<IEnumerable<Tasks>> GetTasksAsync(string? search, int pageNumber, int pageSize)
         {
-            // Tạo IQueryable để xây dựng truy vấn
-            var query = _context.Tasks.AsQueryable();
+            IQueryable<Tasks> query = _context.Tasks.AsNoTracking();
 
-            // Nếu search không trống, lọc theo Title hoặc Description
-            if (!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                query = query.Where(t => t.Title.Contains(search) || t.Description.Contains(search));
+                query = query.Where(t => 
+                    EF.Functions.Like(t.Title, $"%{search}%") || 
+                    EF.Functions.Like(t.Description, $"%{search}%"));
             }
 
-            // Sắp xếp theo DueDate, sau đó phân trang
-            query = query.OrderBy(t => t.DueDate)
+            return await query
+                .OrderBy(t => t.DueDate)  
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
-
-            // AsNoTracking để tối ưu cho đọc dữ liệu
-            return await query.AsNoTracking().ToListAsync();
+                .Take(pageSize)
+                .ToListAsync();
         }
+
 
 
 
@@ -86,31 +84,26 @@ namespace Todo_Api.Services;
         }
         public async Task<bool> UpdateTaskStatusAsync(int id, bool isCompleted)
         {
-            // Include TaskDependencies + Dependency để kiểm tra trạng thái
             var task = await _context.Tasks
                 .Include(t => t.TaskDependencies)
                 .ThenInclude(td => td.Dependency)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
-                return false; // Task không tồn tại
+                return false;
 
-            // Nếu muốn set IsCompleted = true => kiểm tra tất cả Dependency
             if (isCompleted)
             {
-                // Nếu bất kỳ task phụ thuộc nào chưa hoàn thành => không cho phép
                 foreach (var depRelation in task.TaskDependencies)
                 {
                     var depTask = depRelation.Dependency; 
                     if (depTask != null && !depTask.IsCompleted)
                     {
-                        // Dependency chưa xong => từ chối
                         return false;
                     }
                 }
             }
 
-            // Cho phép cập nhật trạng thái
             task.IsCompleted = isCompleted;
             await _context.SaveChangesAsync();
             return true;

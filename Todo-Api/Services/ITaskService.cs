@@ -10,7 +10,7 @@ namespace Todo_Api.Services;
         Task<IEnumerable<Tasks>> GetAllTasksAsync();
 
         Task<Tasks> CreateTaskAsync(TaskCreateDto dto);
-        Task<IEnumerable<Tasks>> GetTasksAsync(string search = null, int pageNumber = 1, int pageSize = 10);
+        Task<IEnumerable<Tasks>> GetTasksAsync(string? search, int pageNumber, int pageSize);
         Task<Tasks> GetTaskByIdAsync(int id);
         Task<bool> UpdateTaskStatusAsync(int id, bool isCompleted);
 

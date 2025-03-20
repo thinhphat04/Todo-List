@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -13,13 +11,13 @@ services:
       - sql_data:/var/opt/mssql
 
   api:
-    build: .
+    build: .  # context là thư mục hiện tại
     container_name: todo-api
     depends_on:
       - db
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
-      ConnectionStrings__MyConnection: "Server=db,1433;Database=todo;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
+      ConnectionStrings__MyConnection: "Server=db,1433;Database=todo;User Id=SA;Password=Your_password123;TrustServerCertificate=True;"
     ports:
       - "5000:80"
     restart: on-failure

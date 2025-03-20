@@ -11,11 +11,9 @@ public class Tasks
     public DateTime DueDate { get; set; }
     public int Priority { get; set; }
     public bool IsCompleted { get; set; }
-
-    // Các task mà task này phụ thuộc vào
+    
     public ICollection<TaskDependency> TaskDependencies { get; set; } = new List<TaskDependency>();
-
-    // Các task phụ thuộc vào task này
+    
     public ICollection<TaskDependency> DependentOnTasks { get; set; } = new List<TaskDependency>();
 }
 

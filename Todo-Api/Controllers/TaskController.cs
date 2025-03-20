@@ -18,24 +18,25 @@ namespace Todo_Api.Controllers
             _taskService = taskService;
         }
         
-        [HttpGet("GetAllTasks")]
-        public async Task<IActionResult> GetAllTasks()
-        {
-            try
-            {
-                var tasks = await _taskService.GetAllTasksAsync();
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+        // [HttpGet("GetAllTasks")]
+        // public async Task<IActionResult> GetAllTasks()
+        // {
+        //     try
+        //     {
+        //         var tasks = await _taskService.GetAllTasksAsync();
+        //         return Ok(tasks);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, ex.Message);
+        //     }
+        // }
      
         // GET: api/task?search=...&pageNumber=1&pageSize=10
         [HttpGet]
-        public async Task<IActionResult> GetTasks([FromQuery] string search, 
-            [FromQuery] int pageNumber = 1, 
+        public async Task<IActionResult> GetTasks(
+            [FromQuery] string? search,
+            [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
             try
@@ -45,10 +46,10 @@ namespace Todo_Api.Controllers
             }
             catch (Exception ex)
             {
-                // Nếu có lỗi ngoài ý muốn, trả về 500
                 return StatusCode(500, ex.Message);
             }
         }
+
 
 
         // GET: api/task/{id}
