@@ -29,7 +29,7 @@ docker exec -it todo-api dotnet ef database update
 ```
 
 4️⃣ Verify services:
-- **API** available at: `http://localhost:5000`
+- **API** available at: `http://localhost:5001`
 - **SQL Server** listening on port `1433`
 
 ## 🗃️ Database Design
