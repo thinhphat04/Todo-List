@@ -2,7 +2,7 @@
 
 RESTful To‑Do List API built with ASP.NET Core .NET 8 and SQL Server, full docker for easy setup.
 
-## 🚀 Installation
+## Installation
 
 ### Prerequisites
 - Docker
@@ -40,11 +40,13 @@ docker exec -it todo-api dotnet ef database update
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/task` | List tasks (supports search, pagination) |
-| POST | `/api/task` | Create a new task |
 | GET | `/api/task/{id}` | Retrieve task by ID |
+| POST | `/api/task` | Create a new task |
 | PUT | `/api/task/{id}` | Update task details |
+| PUT | `/api/task/{id}/status` | Update task status |
 | DELETE | `/api/task/{id}` | Delete a task |
-| PUT | `/api/task/{id}/status` | Toggle task completion status |
-| POST | `/api/task/{id}/dependencies?dependencyId={depId}` | Add a dependency |
-| DELETE | `/api/task/{id}/dependencies/{depId}` | Remove a dependency |
 | GET | `/api/task/{id}/dependencies` | Retrieve full dependency graph |
+| POST | `/api/task/{id}/dependencies?dependencyId={depId}` | Add a dependency |
+| PUT | `/api/task/{id}/status` | Toggle task completion status |
+| DELETE | `/api/task/{id}/dependencies/{depId}` | Remove a dependency |
+
