@@ -1,4 +1,4 @@
-# Todo-List API DROPPII TEST
+# Todo-List API
 
 RESTful To‑Do List API built with ASP.NET Core .NET 8 and SQL Server, full docker for easy setup.
 
